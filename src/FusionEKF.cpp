@@ -77,7 +77,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * You'll need to convert radar from polar to cartesian coordinates.
      */
 
-    // first measurement
+    // first measurement when we just start
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
@@ -98,8 +98,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.x_(1) = rho * sin(phi); //y position
       //while it is possible to calculate the vx and vy using rho_dot and phi,
       //a radar measurement does not contain enough information (so not advised)
-      ekf_.x_(2) = 0; //x velocity
-      ekf_.x_(3) = 0; //y velocity
 
 
     }
@@ -107,8 +105,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       // TODO: Initialize state.
       ekf_.x_(0) = measurement_pack.raw_measurements_(0);
       ekf_.x_(1) = measurement_pack.raw_measurements_(1);
-      ekf_.x_(2) = 0.0;
-      ekf_.x_(3) = 0.0;
+      //initial velocity defaulted to 1
     }
 
     //for tracking time
@@ -135,7 +132,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   //Set F
-  float dt = measurement_pack.timestamp_ - previous_timestamp_;
+  
+  //by default time is in microseconds (so if you divide by 1 million you will get the time in seconds)
+  float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;
+  previous_timestamp_ = measurement_pack.timestamp_;
+
   ekf_.F_(0, 2) = dt;
   ekf_.F_(1, 3) = dt;
   ekf_.F_(0, 0) = 1;
