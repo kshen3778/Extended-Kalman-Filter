@@ -33,12 +33,11 @@ FusionEKF::FusionEKF() {
   R_radar_ << 0.09, 0, 0,
               0, 0.0009, 0,
               0, 0, 0.09;
-  Hj_ = MatrixXd(3, 4);
 
 
   /**
    * TODO: Initialize H_laser
-   Hj_ for radar will be calculated later with CalculateJacobian
+   Hj for radar will be calculated later with CalculateJacobian in the Measurement Update stage.
    Technically, F, Q, and P could be initialized in a later stage
    */
 
